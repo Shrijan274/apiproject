@@ -1,0 +1,32 @@
+# Django specific files
+*.log
+*.pot
+*.pyc
+__pycache__/
+db.sqlite3
+
+# If you use a virtualenv, it's a good idea to exclude it
+venv/
+ENV/
+env/
+.venv/
+.env
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+
+# Static files (if you have a different directory structure, adjust accordingly)
+staticfiles/
+media/
+
+# Local settings
+local_settings.py
+
+# MacOS specific files
+.DS_Store
+
+# Windows specific files
+Thumbs.db
+ehthumbs.db
