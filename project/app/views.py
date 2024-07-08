@@ -3,6 +3,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .serializers import CustomUserSerializer
+from django.shortcuts import render
 
 @api_view(['POST'])
 def signup(request):
@@ -28,3 +29,6 @@ def logout_view(request):
     logout(request)
     return Response({'message': 'Logout successful'}, status=status.HTTP_200_OK)
 
+def index(request):
+    template_name="index.html"
+    return render(request, template_name)

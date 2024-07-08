@@ -1,8 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import CustomUser
+from app.models import CustomUser,Author, Genre, Book
 
-# Define a custom UserAdmin
 class CustomUserAdmin(UserAdmin):
     model = CustomUser
     list_display = ('email', 'username', 'first_name', 'last_name', 'date_joined', 'is_staff', 'is_superuser')
@@ -13,5 +12,21 @@ class CustomUserAdmin(UserAdmin):
     list_filter = ()
     fieldsets = ()
 
-# Register your CustomUser model with the custom UserAdmin
+class BookAdmin(admin.ModelAdmin):
+    model= Book
+    list_display=('title','object_id','content_object')
+
+class AuthorAdmin(admin.ModelAdmin):
+    model=Author
+    list_display=('name','id')
+
+class GenreAdmin(admin.ModelAdmin):
+    model=Genre
+    list_display=('name','id')
+
+
+#registering the customuser model with custom user admin
 admin.site.register(CustomUser, CustomUserAdmin)
+admin.site.register(Author,AuthorAdmin)
+admin.site.register(Book,BookAdmin)
+admin.site.register(Genre,GenreAdmin)

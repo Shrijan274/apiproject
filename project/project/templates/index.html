@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Index Page</title>
+</head>
+<body>
+    <h1>Welcome</h1>
+    <a href="http://127.0.0.1:8000/admin/" target="_blank">django admin Page</a><hr>
+    <p>for testing the requests:</p> 
+    <a href="https://reqbin.com/" target="_blank">open this link</a><hr>
+    <p>for testing signup:<br>
+
+        enter this details-<br>
+        (&nbsp;&nbsp;&nbsp;&nbsp;http://127.0.0.1:8000/api/signup/&nbsp;&nbsp;&nbsp;&nbsp;) --the http address for signup
+        <br><br>
+        {<br>
+               &nbsp;&nbsp;&nbsp;&nbsp;"email":"demo@gmail.com",<br>
+               &nbsp;&nbsp;&nbsp;&nbsp;"username":"demo",<br>
+               &nbsp;&nbsp;&nbsp;&nbsp;"first_name":"abc",<br>
+               &nbsp;&nbsp;&nbsp;&nbsp;"last_name":"def",<br>
+               &nbsp;&nbsp;&nbsp;&nbsp;"password":"demo"<br>
+        }
+        <br><br>
+        copy the json and edit the email and username for successfull requests
+    </p>
+    <hr>
+    <p>for testing login:<br>
+
+        enter this details-<br>
+        (&nbsp;&nbsp;&nbsp;&nbsp;http://127.0.0.1:8000/api/login/&nbsp;&nbsp;&nbsp;&nbsp;) --the http address for login
+        <br><br>
+            {<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;"email":"demo@gmail.com",<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;"password":"demo"<br>
+            }
+        <br><br>
+        copy the json to get successfull login request
+    </p><hr>
+    <p>for testing logout:<br><br>
+        enter this details-<br>
+        (&nbsp;&nbsp;&nbsp;&nbsp;http://127.0.0.1:8000/api/logout/&nbsp;&nbsp;&nbsp;&nbsp;) --the http address for login<br><br>
+        copy the address and send a request withou any data to get a logout message.But first a login must be performed.
+</body>
+</html>
+
