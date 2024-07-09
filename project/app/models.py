@@ -51,6 +51,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
 class Author(models.Model):
     name = models.CharField(max_length=255)
+    books= GenericRelation('Book')
 
     def __str__(self):
         return self.name
@@ -66,6 +67,7 @@ class Book(models.Model):
     
 class Genre(models.Model):
     name = models.CharField(max_length=255)
+    books= GenericRelation('Book')
 
     def __str__(self):
         return self.name
