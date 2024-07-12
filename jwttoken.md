@@ -28,3 +28,8 @@ library used -
 for different languages there are different libraries.
 
 djangorestframework-simplejwt   is used.
+
+
+- uninstalled the simplejwt library
+- installed djangorestframework-jwt library,
+- as the library isnot maintaiend anymore, installed drf-jwt
