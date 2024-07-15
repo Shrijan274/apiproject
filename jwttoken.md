@@ -33,3 +33,6 @@ djangorestframework-simplejwt   is used.
 - uninstalled the simplejwt library
 - installed djangorestframework-jwt library,
 - as the library isnot maintaiend anymore, installed drf-jwt
+
+payload_handler - a custom function which generates payload of the token (issued at, exp,user data)
+encode_handler - encodes the payload data and gives the jwt token

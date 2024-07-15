@@ -63,16 +63,17 @@ REST_FRAMEWORK = {
     ],
 }
 
-
 JWT_AUTH = {
+
+'JWT_SECRET_KEY':'QWERTY!@#qwerty123',
 
 'JWT_VERIFY': True,
  
 'JWT_VERIFY_EXPIRATION': True, #token expiration is true
- 
-'JWT_EXPIRATION_DELTA': timedelta(seconds=3000),
- 
+  
 'JWT_AUTH_HEADER_PREFIX': 'Bearer',
+
+#'JWT_PAYLOAD_HANDLER':jwt_create_payload,
 
 }
 
