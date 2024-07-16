@@ -7,11 +7,9 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated,AllowAny
 from rest_framework.authentication import BasicAuthentication
-from app.service import jwt_generate_token
+from app.service import jwt_generate_token,jwt_token
 from rest_framework_jwt.settings import api_settings
 
-#signup token
-#eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6ImIyQGdtYWlsLmNvbSIsInVzZXJuYW1lIjoiYjIiLCJleHAiOjE3MjEwNzIxODIsIm9yaWdfaWF0IjoxNzIxMDcxODgyfQ.dVDzbZtzXOpQB5t71Gb-PIeA-ewUdTGIPROfecpgGSo
 
 class signup(APIView):
     def post(self,request):
@@ -20,28 +18,29 @@ class signup(APIView):
             user = serializer.save()
             #print(19,user.__dict__)
             #print(20,serializer)
-            token=jwt_generate_token(user)
-            print('token : ',token)
+            #token=jwt_generate_token(user)
+            #print('token : ',token)
             return Response({'message': 'User created successfully'}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     authentication_classes=[BasicAuthentication]
     permission_classes=[AllowAny]
 
-#class TokenObtainPairView(APIView):
-def login(request):
-    email = request.data.get('email')
-    password = request.data.get('password')
-    user = authenticate(request, email=email, password=password)
-
-    if user is not None:
-        login(request, user)
-        return Response({'message': 'Login successful'}, status=status.HTTP_200_OK)
-    else:
-        return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+#@api_view(['POST'])
+class UserLogin(APIView):
     permission_classes=[IsAuthenticated]
+    def post(self,request):
+        email = request.data.get('email')
+        password = request.data.get('password')
+        user = authenticate(request, email=email, password=password)
+
+        if user is not None:
+            token = jwt_token(user)
+            login(request, user)
+            print('token : ',token)
+            return Response({'message': 'Login successful'}, status=status.HTTP_200_OK)
+        else:
+            return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
     
-
-
 @api_view(['POST'])
 def logout_view(request):
     logout(request)
