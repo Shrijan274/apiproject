@@ -35,16 +35,19 @@ class UserLogin(APIView):
         password = request.data.get('password')
         user = authenticate(request, email=email, password=password)
         if user is not None:
-            token = jwt_token(user)
+            global logintoken
+            logintoken = jwt_token(user)
             login(request, user)
-            print('token : ',token)
+            print('token : ',logintoken)
             return Response({'message': 'Login successful'}, status=status.HTTP_200_OK)
         else:
             return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
+
 @api_view(['POST'])
 def logout_view(request):
+    print('token : ',token)
     logout(request)
     return Response({'message': 'Logout successful'}, status=status.HTTP_200_OK)
 
