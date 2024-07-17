@@ -1,14 +1,16 @@
 from django.contrib.auth import authenticate, login, logout
-from rest_framework import status
+from rest_framework import status,generics
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .serializers import CustomUserSerializer
 from django.shortcuts import render
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated,AllowAny
+from rest_framework.permissions import IsAuthenticated,AllowAny,IsAdminUser
 from rest_framework.authentication import BasicAuthentication
 from app.service import jwt_generate_token,jwt_token
 from rest_framework_jwt.settings import api_settings
+from app.models import CustomUser,Author,Book,Genre
+
 
 
 class signup(APIView):
@@ -27,12 +29,11 @@ class signup(APIView):
 
 #@api_view(['POST'])
 class UserLogin(APIView):
-    permission_classes=[IsAuthenticated]
+    permission_classes=[AllowAny]
     def post(self,request):
         email = request.data.get('email')
         password = request.data.get('password')
         user = authenticate(request, email=email, password=password)
-
         if user is not None:
             token = jwt_token(user)
             login(request, user)
@@ -40,7 +41,8 @@ class UserLogin(APIView):
             return Response({'message': 'Login successful'}, status=status.HTTP_200_OK)
         else:
             return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
-    
+
+
 @api_view(['POST'])
 def logout_view(request):
     logout(request)
@@ -49,3 +51,8 @@ def logout_view(request):
 def index(request):
     template_name="index.html"
     return render(request, template_name)
+
+class UserList(generics.ListAPIView):
+    permission_classes=[IsAuthenticated]
+    queryset = CustomUser.objects.all()
+    serializer_class = CustomUserSerializer

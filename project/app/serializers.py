@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import CustomUser
+from .models import CustomUser,Author,Book,Genre
 
 class CustomUserSerializer(serializers.ModelSerializer):
     def validate(self, data):
@@ -30,5 +30,3 @@ class CustomUserSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = ['email', 'username', 'first_name', 'last_name', 'password']
         extra_kwargs = {'password': {'write_only': True}}
-    
-    
