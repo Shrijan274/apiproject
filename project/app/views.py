@@ -47,7 +47,7 @@ class UserLogin(APIView):
 
 @api_view(['POST'])
 def logout_view(request):
-    print('token : ',token)
+    print('token : ',logintoken)
     logout(request)
     return Response({'message': 'Logout successful'}, status=status.HTTP_200_OK)
 
