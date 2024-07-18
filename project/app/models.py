@@ -1,8 +1,10 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
 from django.utils import timezone
-from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.contrib.contenttypes.models import ContentType #stores the data of model instances
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.fields import GenericRelation
+
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, username, password=None, **extra_fields):
@@ -51,7 +53,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
 class Author(models.Model):
     name = models.CharField(max_length=255)
-    books= GenericRelation('Book')
+    books= GenericRelation('Book',content_type_field='content_type',object_id_field='object_id')
 
     def __str__(self):
         return self.name
@@ -67,7 +69,7 @@ class Book(models.Model):
     
 class Genre(models.Model):
     name = models.CharField(max_length=255)
-    books= GenericRelation('Book')
+    books= GenericRelation('Book',content_type_field='content_type',object_id_field='object_id')
 
     def __str__(self):
         return self.name
