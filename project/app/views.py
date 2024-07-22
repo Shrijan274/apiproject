@@ -22,7 +22,7 @@ class signup(APIView):
             #print(20,serializer)
             #token=jwt_generate_token(user)
             #print('token : ',token)
-            return Response({'message': 'User created successfully'}, status=status.HTTP_201_CREATED)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     authentication_classes=[BasicAuthentication]
     permission_classes=[AllowAny]
@@ -43,11 +43,8 @@ class UserLogin(APIView):
         else:
             return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
-
-
 @api_view(['POST'])
 def logout_view(request):
-    print('token : ',logintoken)
     logout(request)
     return Response({'message': 'Logout successful'}, status=status.HTTP_200_OK)
 

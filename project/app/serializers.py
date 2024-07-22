@@ -1,5 +1,7 @@
 from rest_framework import serializers
-from .models import CustomUser,Author,Book,Genre
+from .models import CustomUser
+from datetime import datetime
+
 
 class CustomUserSerializer(serializers.ModelSerializer):
     def validate(self, data):
@@ -19,14 +21,22 @@ class CustomUserSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Invalid name in first name')
         if any(invalid_name in last_name for invalid_name in invalid_names):
             raise serializers.ValidationError('Invalid name in last name')
-        
-        return data    
+        return data
     
     def create(self, validated_data):
         user = CustomUser.objects.create_user(**validated_data)
         return user
+    
+    description = serializers.SerializerMethodField()      
+
+    def get_description(self,obj):
+        now = datetime.now()
+        created_time = now.strftime('%Y-%m-%d %H:%M:%S') 
+        return f"{obj.email} is registered at {created_time}"
 
     class Meta:
         model = CustomUser
-        fields = ['email', 'username', 'first_name', 'last_name', 'password']
+        #fields = '__all__'
+        fields = ['email', 'username', 'first_name', 'last_name', 'password','description']
         extra_kwargs = {'password': {'write_only': True}}
+

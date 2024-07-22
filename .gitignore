@@ -30,3 +30,6 @@ local_settings.py
 # Windows specific files
 Thumbs.db
 ehthumbs.db
+
+dummy.py
+
