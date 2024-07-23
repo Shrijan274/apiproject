@@ -31,5 +31,8 @@ local_settings.py
 Thumbs.db
 ehthumbs.db
 
-dummy.py
-
+pandasdemo.csv
+dummy1.py
+abc.xlsx
+dummy2.py
+pandasdemo2.csv
