@@ -13,15 +13,6 @@ from app.models import CustomUser,Author,Book,Genre
 from django.db import connection
 from django.http import JsonResponse
 
-def sqlquery(request):
-    value=request.GET.get('param',4)            
-    with connection.cursor() as cursor:         # db connection
-        cursor.execute("SELECT * FROM app_author WHERE id > %s ", [value])   #writing a raw query
-        columns = [col[0] for col in cursor.description]        # getting the column names
-        rows = cursor.fetchall()                    #getting the row data
-    results = [dict(zip(columns,row)) for row in rows]      #converting to list of dictionaries
-    print(results)
-    return JsonResponse(results,safe=False)     #false such that it allows list of dictionaries
 
 class signup(APIView):
     def post(self,request):
@@ -66,3 +57,13 @@ class UserList(generics.ListAPIView):
     permission_classes=[IsAuthenticated]
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
+
+def sqlquery(request):
+    value=request.GET.get('param',4)            
+    with connection.cursor() as cursor:         # db connection
+        cursor.execute("SELECT * FROM app_author WHERE id > %s ", [value])   #writing a raw query
+        columns = [col[0] for col in cursor.description]        # getting the column names
+        rows = cursor.fetchall()                    #getting the row data
+    results = [dict(zip(columns,row)) for row in rows]      #converting to list of dictionaries
+    #print(results)
+    return JsonResponse(results,safe=False)     #false such that it allows list of dictionaries

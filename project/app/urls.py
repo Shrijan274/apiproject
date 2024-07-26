@@ -10,6 +10,5 @@ urlpatterns = [
     path('api/login/',UserLogin.as_view(), name='login'),
     path("", views.index, name="index"),
     path('userlist/',UserList.as_view(),name='userlist'),
-    path('sqlquery/',views.sqlquery,name='sqlquery')
-  
+    path('sqlquery/',views.sqlquery,name='sqlquery'),
 ]
