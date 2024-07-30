@@ -27,7 +27,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
         user = CustomUser.objects.create_user(**validated_data)
         return user
     
-    description = serializers.SerializerMethodField()      
+    description = serializers.SerializerMethodField()      # if no method name here, defaulty it takes get_fieldname
 
     def get_description(self,obj):
         now = datetime.now()

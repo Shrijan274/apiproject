@@ -12,6 +12,7 @@ from rest_framework_jwt.settings import api_settings
 from app.models import CustomUser,Author,Book,Genre
 from django.db import connection
 from django.http import JsonResponse
+from rest_framework.throttling import UserRateThrottle,AnonRateThrottle
 
 
 class signup(APIView):
@@ -49,10 +50,13 @@ def logout_view(request):
     logout(request)
     return Response({'message': 'Logout successful'}, status=status.HTTP_200_OK)
 
-def index(request):
-    template_name="index.html"
-    return render(request, template_name)
 
+class index(APIView):
+    throttle_classes = [UserRateThrottle,AnonRateThrottle]
+    def get(self,request):
+        template_name="index.html"
+        return render(request, template_name)
+    
 class UserList(generics.ListAPIView):
     permission_classes=[IsAuthenticated]
     queryset = CustomUser.objects.all()
@@ -67,3 +71,14 @@ def sqlquery(request):
     results = [dict(zip(columns,row)) for row in rows]      #converting to list of dictionaries
     #print(results)
     return JsonResponse(results,safe=False)     #false such that it allows list of dictionaries
+
+
+from app.joins import teachercourses_teacher,teachercourses_courses,teacher_courses
+
+def joins(request):
+    with connection.cursor() as cursor:
+        cursor.execute(teacher_courses)
+        columns = [col[0] for col in cursor.description]        # getting the column names
+        rows = cursor.fetchall()                    #getting the row data
+        results = [dict(zip(columns,row)) for row in rows]
+        return JsonResponse(results,safe=False)

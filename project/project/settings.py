@@ -50,6 +50,8 @@ INSTALLED_APPS = [
     'rest_framework_jwt',
     'rest_framework_jwt.blacklist',
     'app.apps.AppConfig',
+    'viewapp',
+    'drf_yasg'
 ]
 
 REST_FRAMEWORK = {
@@ -61,6 +63,15 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
     ],
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',       #for unauthenticated users, restricting requests from unknown sources, ip address is used to gen a unique key 
+        'rest_framework.throttling.UserRateThrottle',       # for registered users, user id is used to gen a unique key
+],                                                           
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '100/day',
+        'user': '100/day',
+    }
+
 }
 
 JWT_AUTH = {
