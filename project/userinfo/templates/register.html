@@ -1,0 +1,154 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register User</title>
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <link rel="shortcut icon" href="#">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <form id="create-user">
+        <a href="{% url 'loginpage' %}">
+            Back to login
+        </a>
+        <h1>Register User</h1>
+        <label for="name">Name:</label>
+        <input type="text" name="name" id="name" required><br><br>
+
+        <label for="email">Email:</label>
+        <input type="email" name="email" id="email" required><br><br>
+
+        <label for="age">Age:</label>
+        <input type="number" name="age" id="age" required><br><br>
+
+        <label for="gender">Gender:</label>
+        <select id="gender" name="gender" required>
+            <option value="M">Male</option>
+            <option value="F">Female</option>
+        </select><br><br>
+
+        <label for="address">Address:</label>
+        <textarea id="address" name="address" required></textarea><br><br><br>
+
+        <label for="password">Password:</label>
+        <input type="password" name="password" id="password" required><br><br>
+
+        <label for="repassword">Confirm Password:</label>
+        <input type="password" name="repassword" id="repassword" required><br><br>
+
+        <button type="submit" id="submit">Submit</button>
+    </form>    
+
+    <form id="verify-otp" style="display: none;">
+        <h1>Verify OTP</h1>
+        <label for="otp">OTP:</label>
+        <input type="text" name="otp" id="otp" required><br><br>
+        <button type="submit">Verify OTP</button>
+    </form>
+
+    <script>
+        // Function to get CSRF token from the meta tag
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        $(document).ready(function() {
+            let csrftoken = getCookie('csrftoken');
+
+            $('#password, #repassword').on('keyup', function() {
+                let password = $('#password').val();
+                let repassword = $('#repassword').val();
+
+                if (password === repassword && password !== '') {
+                    $('#submit').prop('disabled', false);
+                } else {
+                    $('#submit').prop('disabled', true);
+                }
+            });
+
+            $('#create-user').on('submit', function(e) {
+                e.preventDefault();
+
+                let name = $('#name').val();
+                let email = $('#email').val();
+                let age = $('#age').val();
+                let gender = $('#gender').val();
+                let address = $('#address').val();
+                let password=$('#password').val();
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/user/create/',  // Ensure this matches your Django URL configuration
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        name: name,
+                        email: email,
+                        age: age,
+                        gender: gender,
+                        address: address,
+                        password:password
+                    }),
+                    headers: {
+                        'X-CSRFToken': csrftoken
+                    },
+                    success: function(response) {
+                        alert('Check the email to access the OTP');
+                        console.log(response);
+                        $('#create-user').hide();           //after token is sent, signup form is hidden and verify form is shown.
+                        $('#verify-otp').show();
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error:', error);
+                    }
+                });
+            });
+
+            $('#verify-otp').on('submit', function(e) {
+                e.preventDefault();
+
+                let otp = $('#otp').val();
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/user/verify-otp/',
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        otp: otp
+                    }),
+                    headers: {
+                        'X-CSRFToken': csrftoken
+                    },
+                    success: function(response) {
+                        alert('User created successfully!');
+                        console.log(response);
+                        $('#verify-otp').hide();
+                        $('#create-user').show();
+                        location.reload();
+                    },
+                    error: function(xhr, status, error) {
+                        alert('Invalid OTP');
+                        console.error('Error:', error);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

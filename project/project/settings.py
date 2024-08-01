@@ -51,7 +51,8 @@ INSTALLED_APPS = [
     'rest_framework_jwt.blacklist',
     'app.apps.AppConfig',
     'viewapp',
-    'drf_yasg'
+    'drf_yasg',
+    'userinfo',
 ]
 
 REST_FRAMEWORK = {
@@ -182,4 +183,24 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-AUTH_USER_MODEL = 'app.CustomUser' 
+
+
+# AUTH_USER_MODEL = 'app.CustomUser'
+AUTH_USER_MODEL = 'userinfo.UserInfo'
+
+# AUTHENTICATION_BACKENDS = [
+#     'userinfo.backends.UserInfoBackend',
+#     'app.backends.CustomUserBackend',
+#     'django.contrib.auth.backends.ModelBackend',
+# ]
+
+
+ 
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'shrijancstech@gmail.com'  # Your Gmail address
+EMAIL_HOST_PASSWORD = 'srcp yqyu xteg nzfe'  # Your Gmail password

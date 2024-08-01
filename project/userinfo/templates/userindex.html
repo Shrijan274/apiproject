@@ -1,0 +1,78 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>User Index</title>
+<link rel="shortcut icon" href="#">
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/v/dt/dt-2.0.8/b-3.0.2/b-colvis-3.0.2/datatables.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.dataTables.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.0.2/js/dataTables.buttons.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<link href="https://cdn.datatables.net/v/dt/dt-2.0.8/b-3.0.2/b-colvis-3.0.2/datatables.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+<link href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css" rel="stylesheet">
+</head>
+<body>
+<a href="{% url 'logout' %}">Log Out</a>
+<h1>User Index</h1>
+<table id="userdatatable" style="width: auto;">
+    <thead>
+        <tr>
+            <th id="SrNo" style="width:10%">Sr No</th>
+            <th id="username" style="width:30%;">User's Name</th>
+            <th id="email" style="width:30%;">User's email</th>
+            <th id="editoption" style="width: 20%;"></th>
+        </tr>
+    </thead>
+</table>
+<!-- <a href="{% url 'userlist' %}">userlist</a> -->
+<script>
+$(document).ready( function () {
+    $('#userdatatable').DataTable({
+        ajax:{
+            type:"GET",
+            datatype: 'json',
+            url:"/user/userlist",
+            dataSrc: "",
+        },
+        columns:[
+        {data: 'pk', title: 'Sr No',
+                render: function (data, type, row, meta) {
+                    return meta.row + meta.settings._iDisplayStart + 1;
+                }
+            },
+        {data: 'name', title: 'User Name'},
+        {data: 'email', title: 'User email'},
+        {data: null,
+                className: 'dt-center editor-pencil',
+                defaultContent: '<button class="pencil-btn"><i class="fa fa-pencil"/></>',
+                orderable: false
+            },
+        ],
+        rowCallback: function (row, data) {
+            $(row).data('user-id', data.pk); 
+            $(row).data('user-name', data.name); 
+            $(row).data('user-email', data.email); 
+        }
+    });
+
+    // edit user profile
+    $('#userdatatable').on('click', '.pencil-btn', function (e) {
+        let userId=$(this).closest('tr').data('user-id');
+        let conf= confirm("Are you sure you want to edit this user?");
+        if(conf==true){
+            window.location.href = `/user/edituser/?id=${userId}`;
+           // window.location.href = `/user/edituser/`;
+            console.log('user id : ',userId);
+        }
+        
+    });
+});
+</script>
+
+</body>
+</html>
