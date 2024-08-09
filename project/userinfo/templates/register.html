@@ -3,19 +3,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register User</title>
-    <meta name="csrf-token" content="{{ csrf_token }}">
-    <link rel="shortcut icon" href="#">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Register User</title>
+<meta name="csrf-token" content="{{ csrf_token }}">
+<link rel="shortcut icon" href="#">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<style>
+    #loginlink{
+        float: right;
+        padding: 10px;
+        text-decoration: none;
+        color: rgb(0, 0, 0);
+        margin-right: 10px;
+        margin-top: 5px;
+        font-family:Arial, Helvetica, sans-serif;
+        border-radius: 20px;
+        border: 1px solid rgb(233, 115, 94);
+        background-color: rgb(233, 115, 94);
+        cursor: pointer;
+    }
+    #h1{
+        text-align: center;
+        font-family:monospace;
+        color: rgb(0, 0, 0);
+        margin-top: 25px;
+        margin-bottom: 30px;
+        font-size: 40px;
+
+    }
+    #create-user{
+        text-align: center;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        color: rgb(0, 0, 0);
+    }
+</style>
 </head>
 <body>
+    <h1 id="h1">Register User</h1>
     <form id="create-user">
-        <a href="{% url 'loginpage' %}">
-            Back to login
-        </a>
-        <h1>Register User</h1>
         <label for="name">Name:</label>
         <input type="text" name="name" id="name" required><br><br>
 
@@ -32,17 +60,17 @@
         </select><br><br>
 
         <label for="address">Address:</label>
-        <textarea id="address" name="address" required></textarea><br><br><br>
+        <textarea id="address" name="address" required></textarea><br><br>
 
         <label for="password">Password:</label>
         <input type="password" name="password" id="password" required><br><br>
 
         <label for="repassword">Confirm Password:</label>
-        <input type="password" name="repassword" id="repassword" required><br><br>
+        <input type="password" name="repassword" id="repassword" required><br><br><br><br>
 
         <button type="submit" id="submit">Submit</button>
     </form>    
-
+    <a href="{% url 'loginpage' %}" id="loginlink">Login</a>
     <form id="verify-otp" style="display: none;">
         <h1>Verify OTP</h1>
         <label for="otp">OTP:</label>
@@ -123,14 +151,16 @@
                 e.preventDefault();
 
                 let otp = $('#otp').val();
-
+                let csrfToken = $('input[name="csrfmiddlewaretoken"]').val(); // Get CSRF token
                 $.ajax({
                     type: 'POST',
                     url: '/user/verify-otp/',
                     dataType: 'json',
                     contentType: 'application/json',
                     data: JSON.stringify({
-                        otp: otp
+                        otp: otp,
+                        'csrfmiddlewaretoken': csrfToken // Include CSRF token in the data
+
                     }),
                     headers: {
                         'X-CSRFToken': csrftoken

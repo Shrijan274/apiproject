@@ -8,7 +8,6 @@
     <title>Edit User's profile</title>
     <meta name="csrf-token" content="{{ csrf_token }}">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    
 </head>
 <body>
     <a href="{% url 'userindex' %}">Users Index</a>
@@ -52,8 +51,7 @@
                     console.error('Error fetching user profile:', error);
                 }
             });
-        }
-        $('#editform').on('submit', function(e) {
+            $('#editform').on('submit', function(e) {
             e.preventDefault(); // Prevent the default form submission behavior
             //e.preventDefault();
             let conf= confirm("Are you sure you want to edit this user?");
@@ -86,10 +84,9 @@
                         console.error('Error:', error);
                     }
                     });
-                
-
             }
         });
+        }
     });
 </script>
 </body>

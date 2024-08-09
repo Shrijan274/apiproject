@@ -16,10 +16,11 @@ from django.contrib.auth import authenticate, login, logout
 from rest_framework.permissions import AllowAny,IsAuthenticated
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from django.contrib.auth.decorators import login_required
-from userinfo.forms import UserInfoForm  
 from django.views.generic.edit import UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
+import pandas as pd 
+import pdb
 
 
 
@@ -31,7 +32,6 @@ def  registeruser(request):
 def loginpage(request):
     template_name='login.html'
     return render(request,template_name)
-
 class UserInfoViewSet(viewsets.ModelViewSet):
 
     queryset=UserInfo.objects.all()
@@ -48,7 +48,7 @@ class UserInfoViewSet(viewsets.ModelViewSet):
         serializer=UserNameSerializer(self.get_queryset(),many=True)
         return Response(serializer.data)
     
-    def create(self, request, *args, **kwargs):
+    def create(self, request, *args, **kwargs):     #user data is sent here from 
         #import pdb;pdb.set_trace()
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
@@ -72,16 +72,18 @@ class UserInfoViewSet(viewsets.ModelViewSet):
 
             return Response({'message': 'Check the email to access the OTP'}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
     @action(detail=False, methods=['post'])
     def verify_otp(self, request, *args, **kwargs):
-        otp = request.data.get('otp')
+        a = request.data.get('otp')
+        otp=int(a)
         email = request.session.get('email')
         token = request.session.get('otp_token')
         user_data = request.session.get('user_data')
         password = request.session.get('password')
-        
-        if otp == str(token) and email:
+        #pdb.set_trace()
+        if otp == token and email:
+            user_data['password'] = password
             serializer = self.get_serializer(data=user_data)
             if serializer.is_valid():
                 user = serializer.save()
@@ -93,7 +95,10 @@ class UserInfoViewSet(viewsets.ModelViewSet):
                 request.session.pop('user_data')
                 request.session.pop('password')
                 return Response({'message': 'User created successfully'}, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                error_messages = serializer.errors
+                print("Serializer errors:", error_messages)
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         return Response({'error': 'Invalid OTP'}, status=status.HTTP_400_BAD_REQUEST)
     # sample send mail format
     # send_mail(
@@ -139,8 +144,22 @@ def EditProfile(request):
     template_name='editprofile.html'
     return render(request,template_name)
 
-class UserProfile(generics.RetrieveUpdateAPIView):
+class UserProfile(generics.RetrieveAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = DetailprofileSerializer
     queryset=UserInfo.objects.all()
+
+class fileupload(APIView):
+    def post(self,request,format=None):
+        if 'fileUpload' in request.FILES:
+            recieved_file=request.FILES['fileUpload']
+            try:
+                df=pd.read_excel(recieved_file)     #reading the excel file
+                data=df.to_json(orient='records')   #excel to json
+            except Exception as e:
+                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+            return Response({'data': data}, status=status.HTTP_200_OK)
+        else:
+            return Response({'error': 'No file uploaded'}, status=status.HTTP_400_BAD_REQUEST)
     

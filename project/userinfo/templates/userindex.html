@@ -7,6 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>User Index</title>
 <link rel="shortcut icon" href="#">
+<meta name="csrf-token" content="{{ csrf_token }}">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.datatables.net/v/dt/dt-2.0.8/b-3.0.2/b-colvis-3.0.2/datatables.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/3.0.2/js/buttons.dataTables.js"></script>
@@ -15,23 +17,69 @@
 <link href="https://cdn.datatables.net/v/dt/dt-2.0.8/b-3.0.2/b-colvis-3.0.2/datatables.min.css" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 <link href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css" rel="stylesheet">
+<style>
+    #filetable {
+        width: 100%; 
+        border-collapse: collapse; 
+    }
+
+    #filetable th, #filetable td {
+        border: 1px solid #ddd; 
+        padding: 8px; 
+        text-align: left;
+    }
+
+    #filetable th {
+        background-color: #f2f2f2; 
+        font-weight: bold; 
+    }
+
+    #tableAndButtonsContainer {
+        margin:50px;  
+         }
+</style>
+
 </head>
 <body>
 <a href="{% url 'logout' %}">Log Out</a>
 <h1>User Index</h1>
+<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
 <table id="userdatatable" style="width: auto;">
     <thead>
         <tr>
-            <th id="SrNo" style="width:10%">Sr No</th>
+            <th id="SrNo" style="width:10%">Id</th>
             <th id="username" style="width:30%;">User's Name</th>
             <th id="email" style="width:30%;">User's email</th>
             <th id="editoption" style="width: 20%;"></th>
         </tr>
     </thead>
-</table>
-<!-- <a href="{% url 'userlist' %}">userlist</a> -->
+</table><br><br>
+<form id="upload">
+    <input type="file" id="fileUpload" accept=".xlsx"/><br><br>
+    <button type="submit" id="submit">Next</button><br><br>
+</form>
+<br><br><hr><br>
+<div id="tableAndButtonsContainer" style="display: none;">
+    <table id="filetable" class="table table-bordered">
+
+    </table><br><br>
+    <div id="buttonContainer">
+        <button id="saveButton" class="saveButton">Save</button>
+        <button id="editButton" class="editButton">Edit</button>
+    </div>
+</div>
+
+<!-- <form id="filecontenct">
+    <table id="filetable"></table>
+    <button type="submit" id="save">Save</button>
+    
+</form> -->
+<br><br><br>
 <script>
+let csrftoken = $('input[name="csrfmiddlewaretoken"]').val(); 
+
 $(document).ready( function () {
+    //render user list into table
     $('#userdatatable').DataTable({
         ajax:{
             type:"GET",
@@ -40,7 +88,7 @@ $(document).ready( function () {
             dataSrc: "",
         },
         columns:[
-        {data: 'pk', title: 'Sr No',
+        {data: 'pk', title: 'Id',
                 render: function (data, type, row, meta) {
                     return meta.row + meta.settings._iDisplayStart + 1;
                 }
@@ -55,8 +103,8 @@ $(document).ready( function () {
         ],
         rowCallback: function (row, data) {
             $(row).data('user-id', data.pk); 
-            $(row).data('user-name', data.name); 
-            $(row).data('user-email', data.email); 
+            // $(row).data('user-name', data.name); 
+            // $(row).data('user-email', data.email); 
         }
     });
 
@@ -69,8 +117,59 @@ $(document).ready( function () {
            // window.location.href = `/user/edituser/`;
             console.log('user id : ',userId);
         }
-        
     });
+
+    //displaying table from excel
+    $('#upload').on('submit', function(e){
+        e.preventDefault();
+        
+        let fileInput=$('#fileUpload');
+        let file = fileInput[0].files[0]; 
+        if (!file){
+            alert('Please choose a file');
+        };
+        if (file) {
+            let reader = new FileReader();      //js obj to read files
+            reader.onload = function(e) {
+                let data = new Uint8Array(e.target.result);
+                let workbook = XLSX.read(data, {type: 'array'});
+                let worksheet = workbook.Sheets[workbook.SheetNames[0]];
+                let recieveddata = XLSX.utils.sheet_to_json(worksheet, {header: 1,
+                    raw:false ,});
+                let jsonData = recieveddata.filter(row => row.some(cell => cell !== undefined && cell !== null && cell !== ''));
+                console.log(jsonData);
+                // Extract headers and data
+                let headers = jsonData[0];
+                jsonData.shift(); // Remove the first row - headers
+                // Create a table element
+                let table = document.createElement('table');
+                table.classList.add('table', 'table-bordered'); // Optional: Bootstrap classes
+                // Create table header
+                let thead = table.createTHead();
+                let headerRow = thead.insertRow();
+                headers.forEach(header => {
+                    let th = document.createElement('th');
+                    th.textContent = header;
+                    headerRow.appendChild(th);
+                });
+                // Create table body
+                let tbody = table.createTBody();
+                jsonData.forEach(row => {
+                    let tr = tbody.insertRow();
+                    row.forEach(cell => {
+                        let td = tr.insertCell();
+                        td.textContent = cell;
+                    });
+                });
+                // Append the table to a container
+                document.getElementById('filetable').appendChild(table);
+                document.getElementById('tableAndButtonsContainer').style.display = 'block';
+            };
+
+            reader.readAsArrayBuffer(file);
+    } 
+
+});
 });
 </script>
 
