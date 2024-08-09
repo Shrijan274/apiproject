@@ -60,53 +60,52 @@
 </form>
 <br><br><hr><br>
 <div id="tableAndButtonsContainer" style="display: none;">
-    <table id="filetable" class="table table-bordered">
+    <button id="ConfirmButton" class="ConfirmButton" style="display: none;">Confirm</button><br><br>
 
-    </table><br><br>
     <div id="buttonContainer">
-        <button id="saveButton" class="saveButton">Save</button>
+        <button id="saveButton" class="saveButton">Save</button> &nbsp;  
         <button id="editButton" class="editButton">Edit</button>
     </div>
+<br>
+<label for="filename">Enter name for filename:</label>
+<input type="text" id="filename" name="filename" required/><br><br><br>
+<table id="filetable"></table><br><br>
 </div>
-
-<!-- <form id="filecontenct">
-    <table id="filetable"></table>
-    <button type="submit" id="save">Save</button>
-    
-</form> -->
 <br><br><br>
+    <!-- <table id="fileedit" class="display" style="width: 100%;"></table> -->
 <script>
 let csrftoken = $('input[name="csrfmiddlewaretoken"]').val(); 
 
 $(document).ready( function () {
     //render user list into table
-    $('#userdatatable').DataTable({
-        ajax:{
-            type:"GET",
-            datatype: 'json',
-            url:"/user/userlist",
-            dataSrc: "",
-        },
-        columns:[
-        {data: 'pk', title: 'Id',
-                render: function (data, type, row, meta) {
-                    return meta.row + meta.settings._iDisplayStart + 1;
-                }
-            },
-        {data: 'name', title: 'User Name'},
-        {data: 'email', title: 'User email'},
-        {data: null,
-                className: 'dt-center editor-pencil',
-                defaultContent: '<button class="pencil-btn"><i class="fa fa-pencil"/></>',
-                orderable: false
-            },
-        ],
-        rowCallback: function (row, data) {
-            $(row).data('user-id', data.pk); 
-            // $(row).data('user-name', data.name); 
-            // $(row).data('user-email', data.email); 
-        }
-    });
+    // $('#userdatatable').DataTable({
+    //     ajax:{
+    //         type:"GET",
+    //         datatype: 'json',
+    //         url:"/user/userlist",
+    //         dataSrc: "",
+    //     },
+    //     columns:[
+    //     {data: 'pk', title: 'Id',
+    //             render: function (data, type, row, meta) {
+    //                 return meta.row + meta.settings._iDisplayStart + 1;
+    //             }
+    //         },
+    //     {data: 'name', title: 'User Name'},
+    //     {data: 'email', title: 'User email'},
+    //     {data: null,
+    //             className: 'dt-center editor-pencil',
+    //             defaultContent: '<button class="pencil-btn"><i class="fa fa-pencil"/></>',
+    //             orderable: false
+    //         },
+    //     ],
+    //     rowCallback: function (row, data) {
+    //         $(row).data('user-id', data.pk); 
+    //         // $(row).data('user-name', data.name); 
+    //         // $(row).data('user-email', data.email); 
+    //     }
+    // });
+
 
     // edit user profile
     $('#userdatatable').on('click', '.pencil-btn', function (e) {
@@ -128,49 +127,90 @@ $(document).ready( function () {
         if (!file){
             alert('Please choose a file');
         };
-        if (file) {
-            let reader = new FileReader();      //js obj to read files
-            reader.onload = function(e) {
-                let data = new Uint8Array(e.target.result);
-                let workbook = XLSX.read(data, {type: 'array'});
-                let worksheet = workbook.Sheets[workbook.SheetNames[0]];
-                let recieveddata = XLSX.utils.sheet_to_json(worksheet, {header: 1,
-                    raw:false ,});
-                let jsonData = recieveddata.filter(row => row.some(cell => cell !== undefined && cell !== null && cell !== ''));
-                console.log(jsonData);
-                // Extract headers and data
-                let headers = jsonData[0];
-                jsonData.shift(); // Remove the first row - headers
-                // Create a table element
-                let table = document.createElement('table');
-                table.classList.add('table', 'table-bordered'); // Optional: Bootstrap classes
-                // Create table header
-                let thead = table.createTHead();
-                let headerRow = thead.insertRow();
-                headers.forEach(header => {
-                    let th = document.createElement('th');
-                    th.textContent = header;
-                    headerRow.appendChild(th);
+    
+        let reader = new FileReader();      //js obj to read files
+        reader.onload = function(e) {
+            let data = new Uint8Array(e.target.result);
+            let workbook = XLSX.read(data, {type: 'array'});
+            let worksheet = workbook.Sheets[workbook.SheetNames[0]];
+            let recieveddata = XLSX.utils.sheet_to_json(worksheet, {header: 1,raw:false ,});
+            let jsonData = recieveddata.filter(row => row.some(cell => cell !== undefined && cell !== null && cell !== ''));
+            console.log(jsonData);
+            filewithheaders=JSON.parse(JSON.stringify(jsonData));       //consists 2d array with 
+            //console.log(filewithheaders);
+            let headers = jsonData[0];
+            console.log(headers);
+            jsonData.shift(); // Remove headers
+            // Create a table element
+            let table = document.createElement('table');
+            // Create table header
+            let thead = table.createTHead();
+            let headerRow = thead.insertRow();
+            headers.forEach(header => {
+                let th = document.createElement('th');
+                th.textContent = header;
+                headerRow.appendChild(th);
+            });
+            // Create table body
+            let tbody = table.createTBody();
+            jsonData.forEach(row => {
+                let tr = tbody.insertRow();
+                row.forEach(cell => {
+                    let td = tr.insertCell();
+                    td.textContent = cell;
+                    td.contentEditable = false; // Initially, cells are not editable
                 });
-                // Create table body
-                let tbody = table.createTBody();
-                jsonData.forEach(row => {
-                    let tr = tbody.insertRow();
-                    row.forEach(cell => {
-                        let td = tr.insertCell();
-                        td.textContent = cell;
+            });
+            // Append the table to a container
+            $('#filetable').empty().append(table);
+            $('#tableAndButtonsContainer').show();
+            
+            $('#editButton').on('click', function () {
+                // Make table cells editable
+                $('#filetable td').attr('contenteditable', true);
+                $('#editButton').hide();
+                $('#ConfirmButton').show();
+            });
+
+            // Confirm button functionality
+            $('#ConfirmButton').on('click', function () {
+                let editedData = [];
+                $('#filetable tbody tr').each(function () {
+                    let row = [];
+                    $(this).find('td').each(function () {
+                        row.push($(this).text());
                     });
+                    editedData.push(row);
                 });
-                // Append the table to a container
-                document.getElementById('filetable').appendChild(table);
-                document.getElementById('tableAndButtonsContainer').style.display = 'block';
-            };
 
-            reader.readAsArrayBuffer(file);
-    } 
+                console.log("Edited Data:", editedData); // This will log the edited data
+                // Here you can send the edited data back to the server or process it further
 
+                // Disable further editing after saving
+                $('#filetable td').attr('contenteditable', false);
+                $('#editButton').show();
+                $('#ConfirmButton').hide();
+            });
+
+            //save button functionality
+            $('#saveButton').on('click',function(){
+                let finaldata = [];
+                $('#editButton').click();
+                $('#ConfirmButton').click();
+                $('#filetable tbody tr').each(function () {
+                    let row = [];
+                    $(this).find('td').each(function () {
+                        row.push($(this).text());
+                    });
+                    finaldata.push(row);
+                });
+                console.log("Final Data:", finaldata); // This will log the final data
+            });
+        };
+        reader.readAsArrayBuffer(file);
+    });
 });
-});
+
 </script>
 
 </body>
